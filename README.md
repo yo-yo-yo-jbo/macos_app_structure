@@ -7,10 +7,10 @@ In this blogpost, I intend to discuss some of the first things you might notice 
 Coming from a Windows or Linux background, the concept of Apps might seem weird.
 We all know threads are "units of execution" and processes are containers for threads with their own address space -- what more is there to it?
 Well, processes are rarely deployed in single files. On both Windows and Linux there are many things code might need to function, some of them are:
-- Loadable modules (*.dll, *.so). For example, the C runtime library (`msvcr<version>.dll` on Windows, `libc-<version>.so`) as well as other depndencies.
+- Loadable modules (`.dll`, `.so`). For example, the C runtime library (`msvcr<version>.dll` on Windows, `libc-<version>.so`) as well as other depndencies.
 - Resources. For example, on Windows, executable files come in a format called `PE`, which has directories - one of them is the resource directory (even kind of documented [here](https://referencesource.microsoft.com/#System.Deployment/System/Deployment/Application/PEStream.cs,b01be218023fc607,references) that might contain resources (images, strings and others). Resources could also be loaded from disk dynamically, of course.
 - Digital signatures. Those are less common on Linux (although they do exist in some form - for example, in [Debian Packages](https://www.debian.org/doc/manuals/securing-debian-manual/deb-pack-sign.en.html)) but are important. On Windows they might exist in the `PE` file itself (read [here](https://learn.microsoft.com/en-us/windows-hardware/drivers/install/authenticode)) or in catalogue files (i.e., externally).
-- Configuration. On Linux, those are files (like your trustworthy [.bashrc files](https://linux.die.net/man/1/bash)), and on Windows they split between files (e.g., `XML`, `INI`, `JSON`) and the [Windows Registry](https://en.wikipedia.org/wiki/Windows_Registry).
+- Configuration. On Linux, those are files (like your trustworthy [.bashrc files](https://linux.die.net/man/1/bash)), and on Windows they split between files (e.g., `xml`, `ini`, `json`) and the [Windows Registry](https://en.wikipedia.org/wiki/Windows_Registry).
 - Other executables.
 
 Well, macOS puts heavy emphasis on [Application Bundles](https://en.wikipedia.org/wiki/Bundle_(macOS)). The idea is to package (almost) everything required for the program to run in a directory structure - including resources, localization information, etc.. Of course, not evertything could be nicely packaged (like the C runtime library, for instance) - but it still means that things are *bundled* together nicely - no need to navigate a huge Registry or to read manual pages for obscure configuration file locations. Application bundles are just directories ending with `.app` - even though the UI hides the `.app` extension (and the fact it's a directory).
@@ -55,4 +55,84 @@ Under `Contents` there are multiple items:
 - `_CodeSignature` - non mandatory. As the name suggests - contains code signing information.
 - `version.plist` - non-mandatory, contains verison information.
 
+Note there are very few items that are *officially* required. In fact, we can create our own first App without even compiling anything!
+But first we must discuss that `Info.plist` file.
 
+## Property list files
+The more you look at macOS, the more you'll find those strange files. Those are nothing more than glorified configuration files.
+They will always have a `.plist` extension, which is just a short way of calling their formal name: `Property list` files.
+Unfortunately, there are 3 different `plist` formats maintained by Appled:
+- An `xml` format, readable by humans.
+- A `json` format, not widely used.
+- A binary format, will usually be visible by the text `bplist` as magic.
+
+Luckily, there is a utility called `plutil` that supports all formats. To output a `plist` file, simply use `plutil -p`. For example:
+
+```bash
+jbo@McJbo Contents % plutil -p Info.plist | head -n 20
+{
+  "BuildMachineOSBuild" => "22A380007"
+  "CFBundleDevelopmentRegion" => "English"
+  "CFBundleExecutable" => "Calculator"
+  "CFBundleGetInfoString" => "10.14, Copyright © 2000-2018, Apple Inc."
+  "CFBundleHelpBookFolder" => "Calculator.help"
+  "CFBundleHelpBookName" => "com.apple.Calculator.help"
+  "CFBundleIconFile" => "AppIcon"
+  "CFBundleIconName" => "AppIcon"
+  "CFBundleIdentifier" => "com.apple.calculator"
+  "CFBundleInfoDictionaryVersion" => "6.0"
+  "CFBundleName" => "Calculator"
+  "CFBundlePackageType" => "APPL"
+  "CFBundleShortVersionString" => "10.16"
+  "CFBundleSignature" => "????"
+  "CFBundleSupportedPlatforms" => [
+    0 => "MacOSX"
+  ]
+  "CFBundleVersion" => "223"
+  "CTIgnoreUserFonts" => 1
+jbo@McJbo Contents %
+```
+
+There are also conversion functionalities built into `plutil` - we won't demonstrate those right now.
+Apple [documents](https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Introduction/Introduction.html) several requirements in an App's `Info.plist`, but there are very little fields that are actually mandatory. Here are some interesting fields:
+- `CFBundleExecutable` - the name of the main executable, expected to be under the `MacOS` directory.
+- `CFBundleIconFile` - the name of the icon file. Non-mandatory.
+- `CFBundleIdentifier` - an identifier for the App Bundle. Apple recommends using a reverse DNS notation (e.g. `com.apple.calculator`).
+- `CFBundleName` - the bundle name.
+
+With that in mind, we can create our own first awesome app, *without even coding*!
+Take a look:
+```shell
+#!/bin/zsh
+
+# Create Bundle structure
+mkdir -p ./MyApp.app/Contents/MacOS
+
+# Create main executable file - a shell script in our case
+cat <<EOF > ./MyApp.app/Contents/MacOS/MyApp
+#!/bin/zsh
+osascript -e 'tell app "Finder" to display dialog "Hello from MyApp!"'
+EOF
+chmod +x ./MyApp.app/Contents/MacOS/MyApp
+
+# Create the Info.plist file
+cat <<EOF > ./MyApp.app/Contents/Info.plist
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleExecutable</key>
+	<string>MyApp</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.myapp</string>
+	<key>CFBundleName</key>
+	<string>MyApp</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+</dict>
+</plist>
+EOF
+```
+
+This will create a new app called `MyApp` - clicking it will simply run the `zsh` script (called `MyApp`).
+Note it uses `osascript`, which is an [AppleScript](https://developer.apple.com/library/archive/documentation/AppleScript/Conceptual/AppleScriptLangGuide/introduction/ASLR_intro.html) interpreter and a whole can of worms, but it will just show a dialog that says `Hello from MyApp!`. You could write arbitrary code in that `zsh` shell file, obviously. Newer macOS versions might display a prompt asking to allow `zsh` to call `osascript` - we will discuss why it happens in a future post, but note it won't ask after a first approval.
