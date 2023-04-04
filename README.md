@@ -1,0 +1,1 @@
+# macos_app_structure
