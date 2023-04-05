@@ -166,8 +166,8 @@ jbo@McJbo ~ %
 ```
 
 Indeed, `Calculator` runs smoothly, but is now the child process of our terminal.
-One thing to note in the behavior we've seen is that *attackers might use it for different purposes*. For example, breaking out of the process tree, as well as using logic vulnerabilities (read my [macOS Sandbox escape vulnerability writeup](https://www.microsoft.com/en-us/security/blog/2022/07/13/uncovering-a-macos-app-sandbox-escape-vulnerability-a-deep-dive-into-cve-2022-26706/) for example).
+One thing to note in the behavior we've seen is that *attackers might use it for different purposes*. For example, attackers can easily breaking out of the process tree to evade security tools, as well as abusing logic vulnerabilities (read my [macOS Sandbox escape vulnerability writeup](https://www.microsoft.com/en-us/security/blog/2022/07/13/uncovering-a-macos-app-sandbox-escape-vulnerability-a-deep-dive-into-cve-2022-26706/) if you have time).
 
 There are other interesting responsibilities to `launchd` (read about [LaunchAgents and LaunchDaemons](https://developer.apple.com/library/archive/documentation/MacOSX/Conceptual/BPSystemStartup/Chapters/CreatingLaunchdJobs.html)) but we will not be discussing those for now.
 
-
+## 
