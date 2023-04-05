@@ -137,8 +137,8 @@ EOF
 This will create a new app called `MyApp` - clicking it will simply run the `zsh` script (called `MyApp`).
 Note it uses `osascript`, which is an [AppleScript](https://developer.apple.com/library/archive/documentation/AppleScript/Conceptual/AppleScriptLangGuide/introduction/ASLR_intro.html) interpreter and a whole can of worms, but it will just show a dialog that says `Hello from MyApp!`. You could write arbitrary code in that `zsh` shell file, obviously. Newer macOS versions might display a prompt asking to allow `zsh` to call `osascript` - we will discuss why it happens in a future post, but note it won't ask after a first approval.
 
-# Running an App
-Running an App means that a process is still created - obviously the one pointed by `CFBundleExecutable`. What process does it run under? Let us see:
+# Launching an App
+Launching an App means that a process is still created - obviously the one pointed by `CFBundleExecutable`. What process does it run under? Let us see:
 ```shell
 jbo@McJbo ~ % open -a Calculator
 jbo@McJbo ~ % ps -A -j | grep Calculator | grep -v grep
@@ -166,3 +166,8 @@ jbo@McJbo ~ %
 ```
 
 Indeed, `Calculator` runs smoothly, but is now the child process of our terminal.
+One thing to note in the behavior we've seen is that *attackers might use it for different purposes*. For example, breaking out of the process tree, as well as using logic vulnerabilities (read my [macOS Sandbox escape vulnerability writeup](https://www.microsoft.com/en-us/security/blog/2022/07/13/uncovering-a-macos-app-sandbox-escape-vulnerability-a-deep-dive-into-cve-2022-26706/) for example).
+
+There are other interesting responsibilities to `launchd` (read about [LaunchAgents and LaunchDaemons](https://developer.apple.com/library/archive/documentation/MacOSX/Conceptual/BPSystemStartup/Chapters/CreatingLaunchdJobs.html)) but we will not be discussing those for now.
+
+
