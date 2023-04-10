@@ -170,4 +170,9 @@ One thing to note in the behavior we've seen is that *attackers might use it for
 
 There are other interesting responsibilities to `launchd` (read about [LaunchAgents and LaunchDaemons](https://developer.apple.com/library/archive/documentation/MacOSX/Conceptual/BPSystemStartup/Chapters/CreatingLaunchdJobs.html)) but we will not be discussing those for now.
 
-## 
+# More about bundles
+Here I have shown you one type of bundle but there are plenty more (not a complete list):
+- `.app` - we've seen this one, these are `Application Bundles` that are containers for Apps.
+- `.framework` - contains `Frameworks`, which are *loadable* bundles. Yes, in macOS you can call [dlopen](https://man7.org/linux/man-pages/man3/dlopen.3.html) on a loadable file (`.dylib`) or you can load an entire framework bundle (with resources, code, etc.).
+- `.kext` - contains `kernel extensions`, which are loadable bundles but to the macOS kernel. In recent OS versions Apple really tries hard to reduce the number of kernel extensions.
+- `.plugin` - as the name suggests, a container for plugins.
