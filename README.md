@@ -1,6 +1,6 @@
 # macOS App structure
 Transitioning to macOS from Linux or Windows can feel like walking in a strange new land.
-Since Linux is open-source and Windows is well-documented and very popular, macOS can be challenging at times.
+Since Linux is open-source and Windows is well-documented and very popular (and macOS is neither, exactly), macOS can be challenging at times.
 In this blogpost, I intend to discuss some of the first things you might notice on macOS - Apps, Apps everywhere!
 
 ## Apps vs. processes (tasks?)
