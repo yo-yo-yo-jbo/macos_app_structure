@@ -1,4 +1,4 @@
-# macOS App structure
+# Introduction to macOS - macOS App structure
 Transitioning to macOS from Linux or Windows can feel like walking in a strange new land.
 Since Linux is open-source and Windows is well-documented and very popular (and macOS is neither, exactly), macOS can be challenging at times.
 In this blogpost, I intend to discuss some of the first things you might notice on macOS - Apps, Apps everywhere!
@@ -176,3 +176,12 @@ Here I have shown you one type of bundle but there are plenty more (not a comple
 - `.framework` - contains `Frameworks`, which are *loadable* bundles. Yes, in macOS you can call [dlopen](https://man7.org/linux/man-pages/man3/dlopen.3.html) on a loadable file (`.dylib`) or you can load an entire framework bundle (with resources, code, etc.).
 - `.kext` - contains `kernel extensions`, which are loadable bundles but to the macOS kernel. In recent OS versions Apple really tries hard to reduce the number of kernel extensions.
 - `.plugin` - as the name suggests, a container for plugins.
+
+# Summary
+This is a first of a series of short blogposts aiming to help folks transition to macOS research.  
+The first thing I noticed, from an offensive security perspective, was how easy it is to package payloads in a nice app structure.  
+Things are not so simple though - in the next couple of blogposts we will discover gaining code execution is not that trivial due to the many security features of macOS.
+
+Stay tuned!
+
+Jonathan Bar Or
